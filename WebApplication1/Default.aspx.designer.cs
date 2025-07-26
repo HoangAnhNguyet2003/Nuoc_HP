@@ -15,15 +15,6 @@ namespace WebApplication1
     {
 
         /// <summary>
-        /// spSpan control.
-        /// </summary>
-        /// <remarks>
-        /// Auto-generated field.
-        /// To modify move field declaration from designer file to code-behind file.
-        /// </remarks>
-        protected global::System.Web.UI.WebControls.Literal spSpan;
-
-        /// <summary>
         /// spDongHo control.
         /// </summary>
         /// <remarks>
@@ -42,12 +33,12 @@ namespace WebApplication1
         protected global::System.Web.UI.HtmlControls.HtmlGenericControl spNgay;
 
         /// <summary>
-        /// tbodyContent control.
+        /// spSpan control.
         /// </summary>
         /// <remarks>
         /// Auto-generated field.
         /// To modify move field declaration from designer file to code-behind file.
         /// </remarks>
-        protected global::System.Web.UI.HtmlControls.HtmlGenericControl tbodyContent;
+        protected global::System.Web.UI.HtmlControls.HtmlGenericControl spSpan;
     }
 }

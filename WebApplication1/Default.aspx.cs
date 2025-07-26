@@ -1,90 +1,72 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Web.Script.Serialization;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+using System.Web.UI;
+using System.Web.UI.WebControls;
 
 namespace WebApplication1
 {
-    public partial class _Default : System.Web.UI.Page
+    public partial class _Default : Page
     {
-        private const string V = "http://127.0.0.1:5000/get-all-isolation-data";
-
         protected void Page_Load(object sender, EventArgs e)
         {
-            if (!IsPostBack)
+            String strSql = "select * from tbl_DongHo;select * from tbl_model;";
+            DataSet ds = Microsoft.ApplicationBlocks.Data.SqlHelper.ExecuteDataset(Utils.connectionString, CommandType.Text, strSql);
+
+
+            DataTable dt = ds.Tables[0];
+            string strHtml = "";
+            for (int i = 0; i < dt.Rows.Count; i++)
             {
-                // 1. Lấy danh sách đồng hồ từ Flask API
-                string apiUrl = "http://127.0.0.1:5000/get-all-watch-names";
-                List<string> meters = GetListFromApi(apiUrl);
-
-                // 2. HTML button cho từng đồng hồ (truyền đúng tên đồng hồ)
-                string strHtml = "";
-                foreach (var name in meters)
-                {
-                    // escape ký tự nháy đơn 
-                    string safeName = name.Replace("'", "\\'");
-                    strHtml += $"<button onclick=\"selectMeter('{safeName}')\">{name}</button>";
-                }
-
-                spDongHo.InnerHtml = strHtml;
-
-                // 3. Lấy dữ liệu model LSTM
-                string lstmUrl = "http://127.0.0.1:5000/get-all-lstm-data";
-                string lstmJson = GetJsonFromApi(lstmUrl);
-
-                // 4. Lấy dữ liệu model Isolation
-                string isoUrl = V;
-                string isoJson = GetJsonFromApi(isoUrl);
-
-                // 5. Inject biến JavaScript cho lstmData và isoData 
-                string strScript = "<script>";
-                strScript += $"var lstmData = {lstmJson ?? "[]"};\n";
-                strScript += $"var isoData = {isoJson ?? "[]"};\n";
-                strScript += "</script>";
-                spSpan.Text = strScript;
-
-                // 6. Tạo danh sách ngày gần đây
-                string ngayHtml = "<label for='daySelect'>Chọn ngày:</label>";
-                ngayHtml += "<select id='daySelect' onchange ='onDateChange()'>";
-                for (int i = 0; i <= 15; i++)
-                {
-                    DateTime d = DateTime.Today.AddDays(-i);
-                    string val = d.ToString("dd/MM/yyyy");
-                    ngayHtml += $"<option value='{val}'>{val}</option>";
-                }
-                ngayHtml += "</select>";
-                spNgay.InnerHtml = ngayHtml;
+                strHtml += string.Format("<button onclick=\"selectMeter({0})\">{1}</button>", dt.Rows[i]["ID"].ToString(), dt.Rows[i]["Name"].ToString());
             }
+            spDongHo.InnerHtml = strHtml;
+
+
+            DataTable dt1 = ds.Tables[1];
+            string strScript = "<script>";
+            var strData = ConvertDataTabletoString(dt1);
+            strScript += string.Format("var strData={0}", strData);
+            strScript += "</script>";
+
+            spSpan.InnerHtml = strScript;
+            string ngayHtml = "<label for='daySelect'>Chọn ngày:</label>";
+            ngayHtml += "<select id='daySelect' onchange ='onDateChange()'>";
+
+            for (int i = 0; i <= 15; i++)
+            {
+                DateTime d = DateTime.Today.AddDays(-i);
+                string val = d.ToString("dd/MM/yyyy");
+                ngayHtml += $"<option value = '{val}'>{val}</option>";
+
+            }
+            ngayHtml += "</select>";
+            spNgay.InnerHtml = ngayHtml;
         }
 
-        // Hàm gọi API trả về List<string>
-        private List<string> GetListFromApi(string url)
+        public string ConvertDataTabletoString(DataTable dt)
         {
-            var json = GetJsonFromApi(url);
-            JavaScriptSerializer js = new JavaScriptSerializer();
-            List<string> result = js.Deserialize<List<string>>(json);
-            return result;
-        }
-
-        // Hàm gọi API trả về string
-        private string GetJsonFromApi(string url)
-        {
-            try
+            System.Web.Script.Serialization.JavaScriptSerializer serializer = new System.Web.Script.Serialization.JavaScriptSerializer();
+            List<Dictionary<string, object>> rows = new List<Dictionary<string, object>>();
+            Dictionary<string, object> row;
+            foreach (DataRow dr in dt.Rows)
             {
-                HttpWebRequest request = (HttpWebRequest)WebRequest.Create(url);
-                request.Method = "GET";
-                using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                using (StreamReader sr = new StreamReader(response.GetResponseStream()))
+                row = new Dictionary<string, object>();
+                foreach (DataColumn col in dt.Columns)
                 {
-                    return sr.ReadToEnd();
+                    row.Add(col.ColumnName, dr[col]);
                 }
+                rows.Add(row);
             }
-            catch (Exception ex)
-            {
-
-                return "[]";
-            }
+            return serializer.Serialize(rows);
         }
+
+
     }
 }
+
+
+

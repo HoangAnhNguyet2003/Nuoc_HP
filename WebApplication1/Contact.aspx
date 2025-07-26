@@ -2,27 +2,18 @@
 
 <asp:Content ID="BodyContent" ContentPlaceHolderID="MainContent" runat="server">
     <main aria-labelledby="title">
-
-        <h2 class="text-center">Thông tin liên hệ & hỗ trợ kỹ thuật </h2>
-
-        <address style="text-align: center; line-height: 1.8;">
-            <strong>Trung tâm CNTT & CSDL</strong><br />
-            Địa chỉ: Số , đường , phường, quận, Thành phố <br />
-            <p>Điện thoại: 099 123 4567</p> 
+        <h2 id="title"><%: Title %>.</h2>
+        <h3>Your contact page.</h3>
+        <address>
+            One Microsoft Way<br />
+            Redmond, WA 98052-6399<br />
+            <abbr title="Phone">P:</abbr>
+            425.555.0100
         </address>
 
-        <h3 class="text-center">Hỗ trợ kỹ thuật & hợp tác</h3>
-
-        <address style="text-align: center; line-height: 1.8;">
-            <strong>Email:</strong>
-            <a href="mailto:support@huce.edu.vn">support@huce.edu.vn</a><br />
-            <strong>Website:</strong>
-            <a href="https://www.demo1.huce.edu.vn" target="_blank">www.demo1.huce.edu.vn</a>
+        <address>
+            <strong>Support:</strong>   <a href="mailto:Support@example.com">Support@example.com</a><br />
+            <strong>Marketing:</strong> <a href="mailto:Marketing@example.com">Marketing@example.com</a>
         </address>
-
-        <div style="text-align: center; margin-top: 30px;">
-            <p>Chúng tôi luôn sẵn sàng hỗ trợ để hệ thống hoạt động hiệu quả và chính xác nhất.</p>
-        </div>
     </main>
 </asp:Content>
-

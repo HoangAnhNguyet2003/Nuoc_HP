@@ -1,0 +1,177 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="WebApplication1.SiteMaster" %>
+
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title><%: Page.Title %></title>
+
+    <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/bundles/modernizr") %>
+    </asp:PlaceHolder>
+
+    <webopt:BundleReference runat="server" Path="~/Content/css" />
+    <link href="~/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <style>
+        * {
+            font-family: Arial;
+        }
+
+
+        html, body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            background-color: #e2edf8;
+        }
+
+        form {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .custom-navbar {
+            background-color: #001e42;
+            height: 72px;
+        }
+
+            .custom-navbar .navbar-brand,
+            .custom-navbar .nav-link {
+                color: white;
+            }
+
+
+        .navbar-toggler {
+            background-color: #0d47a1;
+            border: 2px solid #ffffff;
+            border-radius: 6px;
+            padding: 6px 10px;
+            margin-left: 10px !important;
+            margin-right: 0 !important;
+            float: left;
+        }
+
+
+        .navbar-toggler-icon {
+            background-image: url("background_image.svg");
+        }
+
+        .nav-link {
+            font-size: 18px;
+        }
+
+        .custom-navbar .nav-link:hover {
+            color: rgb(74, 172, 218);
+        }
+
+
+        @media (max-width: 576px) {
+            .navbar-toggler {
+                margin-left: 10px !important;
+                margin-right: auto !important;
+                float: none;
+            }
+
+                .navbar-toggler:hover {
+                    background-color: #42a5f5;
+                }
+        }
+
+
+        .body-content {
+            flex: 1;
+        }
+
+        .footer-top {
+            background-color: #001e42; /* Nền xanh đậm */
+            padding: 25px 0; /* Padding trên/dưới */
+            text-align: center; /* Căn giữa */
+        }
+
+            .footer-top p {
+                color: #fff; /* Chữ trắng */
+                margin: 0; /* Xóa khoảng cách mặc định */
+                line-height: 1.7; /* Cho chữ đều hơn */
+                font-size: 18px;
+            }
+
+            .footer-top a,
+            .footer-top .email-link {
+                color: rgb(145, 188, 236); /* Link xanh nhạt */
+                text-decoration: none; /* Bỏ gạch chân mặc định */
+                transition: text-decoration 0.2s;
+            }
+
+                .footer-top a:hover,
+                .footer-top .email-link:hover {
+                    color: #00c8ff;
+                    text-decoration: none; /* Hover thì có gạch chân */
+                }
+    </style>
+</head>
+<body>
+    <form runat="server">
+        <asp:ScriptManager runat="server">
+            <Scripts>
+                <asp:ScriptReference Name="MsAjaxBundle" />
+                <asp:ScriptReference Name="jquery" />
+                <asp:ScriptReference Name="WebForms.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebForms.js" />
+                <asp:ScriptReference Name="WebUIValidation.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebUIValidation.js" />
+                <asp:ScriptReference Name="MenuStandards.js" Assembly="System.Web" Path="~/Scripts/WebForms/MenuStandards.js" />
+                <asp:ScriptReference Name="GridView.js" Assembly="System.Web" Path="~/Scripts/WebForms/GridView.js" />
+                <asp:ScriptReference Name="DetailsView.js" Assembly="System.Web" Path="~/Scripts/WebForms/DetailsView.js" />
+                <asp:ScriptReference Name="TreeView.js" Assembly="System.Web" Path="~/Scripts/WebForms/TreeView.js" />
+                <asp:ScriptReference Name="WebParts.js" Assembly="System.Web" Path="~/Scripts/WebForms/WebParts.js" />
+                <asp:ScriptReference Name="Focus.js" Assembly="System.Web" Path="~/Scripts/WebForms/Focus.js" />
+                <asp:ScriptReference Name="WebFormsBundle" />
+            </Scripts>
+        </asp:ScriptManager>
+
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm custom-navbar">
+
+            <div class="container">
+                <a class="navbar-brand" runat="server" href="~/">Dự đoán rò rỉ nước bằng Trí tuệ nhân tạo</a>
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target=".navbar-collapse"
+                    title="Toggle navigation" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse d-sm-inline-flex justify-content-end">
+                    <ul class="navbar-nav d-flex gap-3">
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/">Trang chủ</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/About">Hướng dẫn</a></li>
+                        <li class="nav-item"><a class="nav-link" runat="server" href="~/Contact">Liên hệ</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+
+        <div class="container body-content flex-grow-1">
+            <asp:ContentPlaceHolder ID="MainContent" runat="server" />
+
+        </div>
+
+        <footer>
+            <div class="footer-top">
+                <p>© 2025 Hanoi University of Civil Engineering. All rights reserved</p>
+                <p>
+                    Design and develop by <a class="email-link" href="https://www.facebook.com/mngs278" target="_blank">Trieu
+            Quoc Dat</a>
+                </p>
+            </div>
+        </footer>
+    </form>
+
+    <asp:PlaceHolder runat="server">
+        <%: Scripts.Render("~/Scripts/bootstrap.js") %>
+    </asp:PlaceHolder>
+</body>
+</html>
