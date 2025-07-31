@@ -60,6 +60,81 @@ def get_all_lstm_data():
 
     return jsonify(result)
 
+@app.route("/get-all-ae-data", methods=["GET"])
+def get_all_ae_data():
+    ae_model = db.autoencoder_models.find_one(sort=[("_id", -1)])
+    if not ae_model:
+        return jsonify([])
+
+    model_type = ae_model.get("model_type", "Autoencoder")
+    watch_doc = db.watch_collection.find_one({"_id": ae_model["watch_id"]})
+    watch_name = watch_doc["data"][0].get("watch_name", "Không rõ") if watch_doc else "Không rõ"
+
+    avg = ae_model["avg_flow"][0]
+    flow = ae_model["flow_AE"][0]
+
+    min_avg_map = dict(zip(avg.get("date_time", []), avg.get("min_avg", [])))
+    max_avg_map = dict(zip(avg.get("date_time", []), avg.get("max_avg", [])))
+
+    morning_dates = flow.get("date_AE_min", [])
+    evening_dates = flow.get("date_AE_max", [])
+
+    morning_losses = flow.get("min_recon_loss", [])
+    evening_losses = flow.get("max_recon_loss", [])
+
+    result = []
+    for i, date in enumerate(morning_dates):
+        result.append({
+            "watch_name": watch_name,
+            "model": model_type,
+            "date": date,
+            "min_avg": min_avg_map.get(date),
+            "max_avg": max_avg_map.get(date),
+            "recon_loss_morning": morning_losses[i] if i < len(morning_losses) else None,
+            "recon_loss_evening": evening_losses[i] if i < len(evening_losses) else None
+        })
+
+    return jsonify(result)
+
+# GET model CTGAN+LSTM
+@app.route("/get-all-ctgan-lstm-data", methods=["GET"])
+def get_all_ctgan_lstm_data():
+    # Lấy bản ghi mới nhất từ collection
+    lstm_model = db.ctgan_lstm_models.find_one(sort=[("_id", -1)])
+    if not lstm_model:
+        return jsonify([])
+
+    model_type = lstm_model.get("model_type", "CTGAN+LSTM")
+
+    # Tìm tên đồng hồ
+    watch_doc = db.watch_collection.find_one({"_id": lstm_model["watch_id"]})
+    watch_name = watch_doc["data"][0].get("watch_name", "Không rõ") if watch_doc else "Không rõ"
+
+    # Lấy dữ liệu trung bình và dự đoán
+    avg = lstm_model["avg_flow"][0]
+    flow = lstm_model["flow_CTGAN_LSTM"][0]
+
+    # Tạo ánh xạ ngày → min_avg và max_avg
+    min_avg_map = dict(zip(avg.get("date_time", []), avg.get("min_avg", [])))
+    max_avg_map = dict(zip(avg.get("date_time", []), avg.get("max_avg", [])))
+
+    result = []
+    date_list = flow.get("date_LSTM", [])
+    
+    for i, date in enumerate(date_list):
+        result.append({
+            "watch_name": watch_name,
+            "model": model_type,
+            "date": date,
+            "min_avg": min_avg_map.get(date),
+            "max_avg": max_avg_map.get(date),
+            "min_pred": flow["min_LSTM"][i] if i < len(flow["min_LSTM"]) else None,
+            "max_pred": flow["max_LSTM"][i] if i < len(flow["max_LSTM"]) else None,
+        })
+
+    return jsonify(result)
+
+
 
 # @app.route("/get-all-vae-data", methods=["GET"])
 # def get_all_vae_data():
