@@ -97,7 +97,9 @@ if os.path.exists(file_path):
     ae_min.save(AE_MODEL_PATH_MIN)
 
     reconstructed_min = ae_min.predict(morning_X)
-    recon_loss_min = np.mean((morning_X - reconstructed_min)**2, axis=(1, 2))
+    recon_loss_min = np.mean((morning_X - reconstructed_min) ** 2, axis=(1, 2))
+    min_real = morning_X[:, -1, 0]
+    min_predicted = reconstructed_min[:, -1, 0]
 
     # === Xử lý Autoencoder (tối) ===
     evening_X, evening_idx = prepare_data(np.array(evening_avg_list), look_back)
@@ -107,7 +109,9 @@ if os.path.exists(file_path):
     ae_max.save(AE_MODEL_PATH_MAX)
 
     reconstructed_max = ae_max.predict(evening_X)
-    recon_loss_max = np.mean((evening_X - reconstructed_max)**2, axis=(1, 2))
+    recon_loss_max = np.mean((evening_X - reconstructed_max) ** 2, axis=(1, 2))
+    max_real = evening_X[:, -1, 0]
+    max_predicted = reconstructed_max[:, -1, 0]
 
     # === Lưu kết quả vào Mongo ===
     db.autoencoder_models.insert_one({
@@ -123,12 +127,17 @@ if os.path.exists(file_path):
         "flow_AE": [
             {
                 "date_AE_min": morning_date_aligned.tolist(),
+                "min_real_values": min_real.tolist(),
+                "min_predicted_values": min_predicted.tolist(),
                 "min_recon_loss": recon_loss_min.tolist(),
+
                 "date_AE_max": evening_date_aligned.tolist(),
+                "max_real_values": max_real.tolist(),
+                "max_predicted_values": max_predicted.tolist(),
                 "max_recon_loss": recon_loss_max.tolist()
             }
         ]
     })
-    print("✅ Lưu Autoencoder và kết quả xong.")
+    print("✅ Đã lưu Autoencoder và kết quả vào MongoDB.")
 else:
     print(f"❌ Không tìm thấy file {file_path}")

@@ -7,7 +7,7 @@ from tensorflow.keras.models import Model
 from tensorflow.keras.layers import LSTM, Input, RepeatVector
 from tensorflow.keras.callbacks import EarlyStopping
 
-# ========== CẤU HÌNH ==========
+# ========== CẤU HÌNH ========== #
 np.random.seed(42)
 tf.random.set_seed(42)
 
@@ -19,7 +19,7 @@ RESULT_PATH_MORNING = '../model/autoecoder/results_morning.csv'
 RESULT_PATH_EVENING = '../model/autoecoder/results_evening.csv'
 look_back = 14
 
-# ========== HÀM TIỆN ÍCH ==========
+# ========== HÀM TIỆN ÍCH ========== #
 def prepare_data(values, look_back):
     X, dates = [], []
     for i in range(len(values) - look_back):
@@ -59,13 +59,30 @@ def train_autoencoder_only(X_real, date_list, ae_path, result_path):
     print("📊 Tính reconstruction loss...")
     mse_per_sample = np.mean((X_real - reconstructed) ** 2, axis=(1, 2))
 
-    pd.DataFrame({
+    df_loss = pd.DataFrame({
         'Ngày': date_list,
         'Reconstruction_Loss': mse_per_sample
-    }).to_csv(result_path, index=False)
+    })
+    df_loss.to_csv(result_path, index=False)
     print(f"📁 Đã lưu kết quả loss từng ngày vào: {result_path}")
 
-# ========== TIỀN XỬ LÝ DỮ LIỆU ==========
+    # ========== Lưu thêm file tái tạo 1 dòng/ngày ========== #
+    print("📦 Lưu chuỗi dữ liệu theo ngày...")
+
+    actual_last_values = X_real[:, -1, 0]
+    predicted_last_values = reconstructed[:, -1, 0]
+
+    df_predict = pd.DataFrame({
+        'Ngày': date_list,
+        'Giá trị gốc': actual_last_values,
+        'Giá trị tái tạo': predicted_last_values
+    })
+
+    predict_path = result_path.replace(".csv", "_timeseries.csv")
+    df_predict.to_csv(predict_path, index=False)
+    print(f"✅ Đã lưu dữ liệu tái tạo theo ngày vào: {predict_path}")
+
+# ========== TIỀN XỬ LÝ DỮ LIỆU ========== #
 morning_values = []
 evening_values = []
 morning_dates = []
@@ -108,13 +125,13 @@ for filename in os.listdir(folder_path):
                 evening_values.append(avg)
                 evening_dates.append(date)
 
-# ========== CHUẨN BỊ DỮ LIỆU ==========
+# ========== CHUẨN BỊ DỮ LIỆU ========== #
 morning_X, morning_d = prepare_data(np.array(morning_values), look_back)
 evening_X, evening_d = prepare_data(np.array(evening_values), look_back)
 morning_date_list = np.array(morning_dates)[morning_d]
 evening_date_list = np.array(evening_dates)[evening_d]
 
-# ========== HUẤN LUYỆN AUTOENCODER ==========
+# ========== HUẤN LUYỆN AUTOENCODER ========== #
 if __name__ == "__main__":
     print("=====  Đào tạo Autoencoder sáng =====")
     train_autoencoder_only(morning_X, morning_date_list, AE_PATH_MORNING, RESULT_PATH_MORNING)
