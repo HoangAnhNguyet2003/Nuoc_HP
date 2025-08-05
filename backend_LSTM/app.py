@@ -40,7 +40,7 @@ def login():
     if not bcrypt.checkpw(password.encode("utf-8"), user["password"].encode("utf-8")):
         return jsonify({"msg": "Sai mật khẩu"}), 401
 
-    # ✅ sửa identity thành string
+    #  sửa identity thành string
     access_token = create_access_token(
         identity=str(user["user_id"]),
         additional_claims={
